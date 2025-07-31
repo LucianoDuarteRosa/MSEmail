@@ -92,7 +92,7 @@ curl -X POST "https://localhost:7136/api/emailtemplates" \
 ### Docker não funciona?
 ```powershell
 # Execute como Administrador
-.\configure-docker.ps1
+.\configure-docker.dev.ps1
 
 # Depois execute o setup principal
 .\setup.ps1

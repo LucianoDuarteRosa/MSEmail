@@ -6,10 +6,11 @@
 Script unificado para configuração completa do ambiente de desenvolvimento.
 
 **Funcionalidades:**
-- ✅ Verificação automática do Docker
+- ✅ Verificação automática do Docker e .NET
 - ✅ Configuração do PATH se necessário
 - ✅ Deploy dos containers (RabbitMQ + MailHog)
 - ✅ Execução das migrations do Entity Framework
+- ✅ Inicialização automática da API e Worker em janelas separadas
 - ✅ Verificação do status dos serviços
 
 **Como usar:**
@@ -17,16 +18,16 @@ Script unificado para configuração completa do ambiente de desenvolvimento.
 .\setup.ps1
 ```
 
+**O que acontece:**
+- Para containers existentes e sobe novos
+- Aguarda containers ficarem prontos
+- Executa migrations do banco
+- Abre 2 janelas PowerShell: uma para API e outra para Worker
+- Mostra URLs dos serviços
+
 ### `configure-docker.ps1`
 Script auxiliar para configuração do Docker PATH (usado automaticamente pelo setup.ps1 se necessário).
 
-## Scripts Legados (Não usar)
-
-### `setup-old.ps1`
-Versão anterior do script de setup. **OBSOLETO** - usar `setup.ps1` no lugar.
-
-### `setup.sh`
-Script para sistemas Linux/Mac. **NÃO FUNCIONA NO WINDOWS** - usar `setup.ps1` no lugar.
 
 ## Recomendação
 
