@@ -11,19 +11,19 @@ POST https://localhost:7136/api/emailtemplates
 1. Execute o## 6. Consultar Estatísticas
 
 ```http
-GET https://localhost:7077/api/emails/statistics
+GET https://localhost:7136/api/emails/statistics
 ```
 
 ## 7. Reprocessar E-mail
 
 ```http
-POST https://localhost:7077/api/emails/GUID-DO-EMAIL/reprocess
+POST https://localhost:7136/api/emails/GUID-DO-EMAIL/reprocess
 ```
 
 ## 8. Listar Logs por Status
 
 ```http
-GET https://localhost:7077/api/emails/logs/by-status/Failed.ps1`
+GET https://localhost:7136/api/emails/logs/by-status/Failed.ps1`
 2. Inicie a API: `cd MSEmail.API && dotnet run`
 3. Inicie o Worker: `cd MSEmail.Worker && dotnet run`
 4. **Acesse o MailHog**: http://localhost:8025 (para visualizar e-mails)
@@ -37,7 +37,7 @@ GET https://localhost:7077/api/emails/logs/by-status/Failed.ps1`
 ## 1. Criar Template de E-mail
 
 ```http
-POST https://localhost:7077/api/emailtemplates
+POST https://localhost:7136/api/emailtemplates
 Content-Type: application/json
 
 {
@@ -50,7 +50,7 @@ Content-Type: application/json
 ## 2. Criar Destinatário
 
 ```http
-POST https://localhost:7077/api/recipients
+POST https://localhost:7136/api/recipients
 Content-Type: application/json
 
 {
@@ -64,19 +64,19 @@ Content-Type: application/json
 ## 3. Listar Templates
 
 ```http
-GET https://localhost:7077/api/emailtemplates
+GET https://localhost:7136/api/emailtemplates
 ```
 
 ## 4. Obter Template por Nome
 
 ```http
-GET https://localhost:7077/api/emailtemplates/by-name/Fatura%20CDC
+GET https://localhost:7136/api/emailtemplates/by-name/Fatura%20CDC
 ```
 
 ## 5. Enviar E-mails
 
 ```http
-POST https://localhost:7077/api/emails/send
+POST https://localhost:7136/api/emails/send
 Content-Type: application/json
 
 {
@@ -156,7 +156,7 @@ GET http://localhost:5000/api/emails/logs/by-status/Failed
 ```bash
 # Criar múltiplos destinatários
 for i in {1..100}; do
-  curl -X POST https://localhost:7077/api/recipients \
+  curl -X POST https://localhost:7136/api/recipients \
     -H "Content-Type: application/json" \
     -d "{
       \"name\": \"Usuario $i\",
@@ -167,7 +167,7 @@ for i in {1..100}; do
 done
 
 # Enviar para todos
-curl -X POST https://localhost:7077/api/emails/send \
+curl -X POST https://localhost:7136/api/emails/send \
   -H "Content-Type: application/json" \
   -d "{
     \"emailTemplateId\": \"GUID-DO-TEMPLATE\",
@@ -238,8 +238,8 @@ Para testar localmente:
 
 ## URLs de Desenvolvimento
 
-- **API**: https://localhost:7077
-- **Swagger**: https://localhost:7077/swagger
+- **API**: https://localhost:7136
+- **Swagger**: https://localhost:7136/swagger
 - **MailHog Web**: http://localhost:8025
 - **MailHog API**: http://localhost:8025/api/v1/messages
 - **RabbitMQ Management**: http://localhost:15672 (guest/guest)

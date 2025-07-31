@@ -13,6 +13,25 @@ MSEmail é um microserviço completo desenvolvido em .NET 8 para envio automáti
 - ✅ Logging detalhado
 - ✅ Configuração por variáveis de ambiente
 
+## Scripts de Configuração
+
+### Script Principal: `setup.ps1`
+
+Execute o script principal para configurar todo o ambiente:
+
+```powershell
+.\setup.ps1
+```
+
+**O script irá:**
+- ✅ Verificar se o Docker está instalado e configurado
+- ✅ Configurar o PATH do Docker se necessário (instalação via Microsoft Store)
+- ✅ Fazer o deploy dos containers (RabbitMQ + MailHog)
+- ✅ Executar as migrations do Entity Framework
+- ✅ Verificar o status dos serviços
+
+> **💡 Dica:** Para mais informações sobre os scripts disponíveis, consulte [`SCRIPTS_INFO.md`](SCRIPTS_INFO.md)
+
 ## Arquitetura
 
 O projeto segue a arquitetura Clean Architecture com as seguintes camadas:
@@ -188,10 +207,17 @@ Execute o script de setup que configura tudo automaticamente:
 
 O script irá:
 - ✅ Verificar se Docker e .NET 8 estão instalados
+- ✅ Configurar Docker automaticamente (se necessário)
 - ✅ Subir containers do RabbitMQ e MailHog
 - ✅ Instalar EF Core Tools (se necessário)
 - ✅ Executar as migrações do banco
 - ✅ Criar diretórios necessários
+
+**Se o Docker não funcionar**, execute primeiro:
+```powershell
+# Configure o Docker no PATH (apenas uma vez)
+.\configure-docker.ps1
+```
 
 ### Opção 2: Setup Manual
 

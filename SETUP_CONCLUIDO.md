@@ -14,8 +14,9 @@
 
 ### 3. **Arquivos Criados/Atualizados**
 - ✅ `docker-compose.dev.yml` - Para desenvolvimento local
-- ✅ `setup.ps1` - Script de configuração automática
-- ✅ `configure-docker.ps1` - Script para configurar Docker no PATH
+- ✅ `setup.ps1` - Script principal de configuração automática
+- ✅ `configure-docker.ps1` - Script específico para configurar Docker no PATH
+- ✅ `setup-old.ps1` - Script anterior (mantido como backup)
 - ✅ `API_EXAMPLES.md` - Exemplos de uso da API
 - ✅ `README.md` - Documentação atualizada
 
@@ -26,7 +27,7 @@
 cd MSEmail.API
 dotnet run
 ```
-- **Swagger**: https://localhost:7136
+- **Swagger**: https://localhost:7136/swagger
 
 ### 2. **Executar o Worker**
 ```powershell
@@ -36,7 +37,7 @@ dotnet run
 ```
 
 ### 3. **Testar Envio de E-mails**
-1. Acesse o **Swagger**: https://localhost:7136/swagger
+1. Acesse o **Swagger**: https://localhost:7136
 2. Crie um template de e-mail
 3. Crie destinatários
 4. Envie e-mails
@@ -46,7 +47,7 @@ dotnet run
 
 | Serviço | URL | Credenciais |
 |---------|-----|-------------|
-| **API Swagger** | https://localhost:7136/swagger | - |
+| **API Swagger** | https://localhost:7136 | - |
 | **MailHog Web** | http://localhost:8025 | - |
 | **RabbitMQ Management** | http://localhost:15672 | guest/guest |
 
@@ -84,10 +85,17 @@ curl -X POST "https://localhost:7136/api/emailtemplates" \
 
 ## 🔧 Solução de Problemas:
 
+### Scripts Disponíveis:
+- **`.\setup.ps1`** - Script principal (recomendado) - configura tudo automaticamente
+- **`.\configure-docker.ps1`** - Apenas para configurar Docker no PATH se necessário
+
 ### Docker não funciona?
 ```powershell
 # Execute como Administrador
 .\configure-docker.ps1
+
+# Depois execute o setup principal
+.\setup.ps1
 ```
 
 ### Containers não sobem?
