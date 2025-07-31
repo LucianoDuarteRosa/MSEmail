@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: msemail-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - msemail-network
+
+  # MailHog Email Testing
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: msemail-mailhog
+    ports:
+      - "1025:1025"   # SMTP port
+      - "8025:8025"   # Web UI port
+    networks:
+      - msemail-network
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  msemail-network:
+    driver: bridge

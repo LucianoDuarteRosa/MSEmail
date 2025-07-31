@@ -1,9 +1,37 @@
 # Exemplos de Teste da API MSEmail
 
+## Pré-requisitos
+
+1. Execute o## 6. Consultar Estatísticas
+
+```http
+GET https://localhost:7077/api/emails/statistics
+```
+
+## 7. Reprocessar E-mail
+
+```http
+POST https://localhost:7077/api/emails/GUID-DO-EMAIL/reprocess
+```
+
+## 8. Listar Logs por Status
+
+```http
+GET https://localhost:7077/api/emails/logs/by-status/Failed.ps1`
+2. Inicie a API: `cd MSEmail.API && dotnet run`
+3. Inicie o Worker: `cd MSEmail.Worker && dotnet run`
+4. **Acesse o MailHog**: http://localhost:8025 (para visualizar e-mails)
+
+## URLs Importantes
+
+- **API Swagger**: https://localhost:7077
+- **MailHog Web UI**: http://localhost:8025 (visualizar e-mails enviados)
+- **RabbitMQ Management**: http://localhost:15672 (guest/guest)
+
 ## 1. Criar Template de E-mail
 
 ```http
-POST http://localhost:5000/api/emailtemplates
+POST https://localhost:7077/api/emailtemplates
 Content-Type: application/json
 
 {
@@ -16,7 +44,7 @@ Content-Type: application/json
 ## 2. Criar Destinatário
 
 ```http
-POST http://localhost:5000/api/recipients
+POST https://localhost:7077/api/recipients
 Content-Type: application/json
 
 {
@@ -30,19 +58,19 @@ Content-Type: application/json
 ## 3. Listar Templates
 
 ```http
-GET http://localhost:5000/api/emailtemplates
+GET https://localhost:7077/api/emailtemplates
 ```
 
 ## 4. Obter Template por Nome
 
 ```http
-GET http://localhost:5000/api/emailtemplates/by-name/Fatura%20CDC
+GET https://localhost:7077/api/emailtemplates/by-name/Fatura%20CDC
 ```
 
 ## 5. Enviar E-mails
 
 ```http
-POST http://localhost:5000/api/emails/send
+POST https://localhost:7077/api/emails/send
 Content-Type: application/json
 
 {
@@ -122,7 +150,7 @@ GET http://localhost:5000/api/emails/logs/by-status/Failed
 ```bash
 # Criar múltiplos destinatários
 for i in {1..100}; do
-  curl -X POST http://localhost:5000/api/recipients \
+  curl -X POST https://localhost:7077/api/recipients \
     -H "Content-Type: application/json" \
     -d "{
       \"name\": \"Usuario $i\",
@@ -133,7 +161,7 @@ for i in {1..100}; do
 done
 
 # Enviar para todos
-curl -X POST http://localhost:5000/api/emails/send \
+curl -X POST https://localhost:7077/api/emails/send \
   -H "Content-Type: application/json" \
   -d "{
     \"emailTemplateId\": \"GUID-DO-TEMPLATE\",
@@ -142,27 +170,70 @@ curl -X POST http://localhost:5000/api/emails/send \
   }"
 ```
 
+## Testando com MailHog
+
+### 1. Verificar E-mails Enviados
+
+Após enviar e-mails via API:
+
+1. **Acesse a interface web**: http://localhost:8025
+2. **Visualize os e-mails**: Todos os e-mails aparecerão na lista
+3. **Clique para ver detalhes**: Assunto, corpo, anexos, etc.
+4. **Teste variáveis**: Verifique se `{usuario.nome}`, `{usuario.cdc}` foram substituídos
+
+### 2. API do MailHog
+
+```bash
+# Listar todos os e-mails
+curl http://localhost:8025/api/v1/messages
+
+# Obter e-mail específico
+curl http://localhost:8025/api/v1/messages/{ID}
+
+# Limpar todos os e-mails
+curl -X DELETE http://localhost:8025/api/v1/messages
+```
+
+### 3. Monitoramento em Tempo Real
+
+```bash
+# Script para monitorar e-mails em tempo real
+while true; do
+  clear
+  echo "=== E-mails no MailHog ==="
+  curl -s http://localhost:8025/api/v1/messages | jq '.items | length'
+  echo "Atualizado em: $(date)"
+  sleep 5
+done
+```
+
 ## Configuração de Teste Local
 
-Para testar localmente, configure:
+Para testar localmente:
 
-1. **PostgreSQL:**
-   ```bash
-   docker run --name postgres-test -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=msemail_test -p 5432:5432 -d postgres:15
+1. **Execute o setup automático:**
+   ```powershell
+   .\setup.ps1
    ```
 
-2. **RabbitMQ:**
+2. **Ou configure manualmente:**
    ```bash
-   docker run --name rabbitmq-test -p 5672:5672 -p 15672:15672 -d rabbitmq:3-management
+   # Subir RabbitMQ e MailHog
+   docker-compose -f docker-compose.dev.yml up -d
+   
+   # Criar diretório para arquivos
+   mkdir -p ./files
    ```
 
 3. **Criar arquivo de teste PDF:**
    ```bash
-   mkdir -p c:\temp\msemail\files
-   echo "Conteúdo de teste da fatura" > c:\temp\msemail\files\fatura_janeiro_2025.pdf
+   echo "Conteúdo de teste da fatura" > ./files/fatura_janeiro_2025.pdf
    ```
 
-4. **Configurar SMTP (Gmail):**
-   - Ativar verificação em 2 etapas
-   - Gerar senha de app
-   - Usar a senha de app no appsettings.json
+## URLs de Desenvolvimento
+
+- **API**: https://localhost:7077
+- **Swagger**: https://localhost:7077/swagger
+- **MailHog Web**: http://localhost:8025
+- **MailHog API**: http://localhost:8025/api/v1/messages
+- **RabbitMQ Management**: http://localhost:15672 (guest/guest)

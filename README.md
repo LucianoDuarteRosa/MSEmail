@@ -72,7 +72,38 @@ MSEmail/
 - PostgreSQL
 - RabbitMQ
 
-### Variáveis de Ambiente (Produção)
+### Variáveis de Ambiente
+
+#### Para Desenvolvimento (MailHog)
+
+```bash
+# Banco de Dados
+DB_HOST=localhost
+DB_NAME=msemail
+DB_USER=postgres
+DB_PASSWORD=admin
+
+# SMTP (MailHog para desenvolvimento)
+SMTP_HOST=localhost
+SMTP_PORT=1025
+SMTP_SSL=false
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_FROM_EMAIL=sistema@msemail.local
+SMTP_FROM_NAME="Sistema de Faturas"
+
+# RabbitMQ
+RABBITMQ_HOST=localhost
+RABBITMQ_PORT=5672
+RABBITMQ_USER=guest
+RABBITMQ_PASSWORD=guest
+
+# Armazenamento
+STORAGE_TYPE=Local
+STORAGE_PATH=/app/files
+```
+
+#### Para Produção (Gmail)
 
 ```bash
 # Banco de Dados
@@ -81,7 +112,7 @@ DB_NAME=msemail
 DB_USER=postgres
 DB_PASSWORD=sua_senha
 
-# SMTP
+# SMTP (Gmail para produção)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SSL=true
@@ -108,33 +139,113 @@ Edite os arquivos `appsettings.Development.json` em cada projeto:
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Database=msemail_dev;Username=postgres;Password=123456"
+    "DefaultConnection": "Host=localhost;Database=msemail;Username=postgres;Password=admin"
   },
   "SmtpSettings": {
-    "Host": "smtp.gmail.com",
-    "Port": 587,
-    "EnableSsl": true,
-    "Username": "seu_email@gmail.com",
-    "Password": "sua_senha_de_app",
-    "FromEmail": "seu_email@gmail.com",
+    "Host": "localhost",
+    "Port": 1025,
+    "EnableSsl": false,
+    "Username": "",
+    "Password": "",
+    "FromEmail": "sistema@msemail.local",
     "FromName": "Sistema de Faturas"
   }
 }
 ```
 
+**Nota:** A configuração acima usa o MailHog para simular o envio de e-mails durante o desenvolvimento. Todos os e-mails enviados podem ser visualizados na interface web do MailHog em http://localhost:8025.
+
+### MailHog - Simulador de E-mail para Desenvolvimento
+
+O MailHog é uma ferramenta que simula um servidor SMTP para desenvolvimento, capturando todos os e-mails enviados e disponibilizando uma interface web para visualização.
+
+**Características:**
+- Interface web amigável para visualizar e-mails
+- Não envia e-mails reais (seguro para desenvolvimento)
+- API REST para automação de testes
+- Suporte a anexos e e-mails HTML
+
+**Como usar:**
+1. Execute o container do MailHog: `docker-compose -f docker-compose.dev.yml up -d`
+2. Configure a aplicação para usar `localhost:1025` como servidor SMTP
+3. Acesse http://localhost:8025 para ver os e-mails enviados
+
+**URLs importantes:**
+- **Interface Web**: http://localhost:8025
+- **Servidor SMTP**: localhost:1025
+- **API REST**: http://localhost:8025/api/v1/messages
+
 ## Como Executar
 
-### 1. Preparar o Ambiente
+### Opção 1: Setup Automático (Recomendado)
 
-```bash
-# Executar PostgreSQL (Docker)
-docker run --name postgres-msemail -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=msemail_dev -p 5432:5432 -d postgres:15
+Execute o script de setup que configura tudo automaticamente:
 
-# Executar RabbitMQ (Docker)
-docker run --name rabbitmq-msemail -p 5672:5672 -p 15672:15672 -d rabbitmq:3-management
+```powershell
+# Execute no PowerShell como Administrador
+.\setup.ps1
 ```
 
-### 2. Executar a API
+O script irá:
+- ✅ Verificar se Docker e .NET 8 estão instalados
+- ✅ Subir containers do RabbitMQ e MailHog
+- ✅ Instalar EF Core Tools (se necessário)
+- ✅ Executar as migrações do banco
+- ✅ Criar diretórios necessários
+
+### Opção 2: Setup Manual
+
+#### 1. Preparar o Ambiente
+
+#### Opção 1: Usando Docker Compose (Recomendado para Desenvolvimento)
+
+Para subir apenas os serviços necessários (RabbitMQ e MailHog) para desenvolvimento local:
+
+```bash
+# Subir RabbitMQ e MailHog
+docker-compose -f docker-compose.dev.yml up -d
+
+# Verificar se os containers estão rodando
+docker ps
+```
+
+**Serviços disponíveis:**
+- **RabbitMQ Management**: http://localhost:15672 (usuário: `guest`, senha: `guest`)
+- **MailHog Web UI**: http://localhost:8025 (interface para visualizar e-mails enviados)
+
+#### Opção 2: Usando Docker individualmente
+
+```bash
+# Executar PostgreSQL (se não tiver instalado localmente)
+docker run --name postgres-msemail -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=msemail -p 5432:5432 -d postgres:15
+
+# Executar RabbitMQ
+docker run --name rabbitmq-msemail -p 5672:5672 -p 15672:15672 -d rabbitmq:3-management
+
+# Executar MailHog para simular envio de e-mails
+docker run --name mailhog-msemail -p 1025:1025 -p 8025:8025 -d mailhog/mailhog:v1.0.1
+```
+
+### 2. Configurar o Banco de Dados
+
+Certifique-se de que o PostgreSQL está rodando e crie o banco de dados:
+
+```sql
+-- Conectar no PostgreSQL e criar o banco
+CREATE DATABASE msemail;
+```
+
+### 3. Executar as Migrações
+
+```bash
+# Navegar para o projeto da API
+cd MSEmail.API
+
+# Executar as migrações do Entity Framework
+dotnet ef database update
+```
+
+### 4. Executar a API
 
 ```bash
 cd MSEmail.API
@@ -143,11 +254,40 @@ dotnet run
 
 A API estará disponível em: https://localhost:7077 (Swagger na raiz)
 
-### 3. Executar o Worker
+### 5. Executar o Worker
 
 ```bash
 cd MSEmail.Worker
 dotnet run
+```
+
+### 6. Testar o Envio de E-mails
+
+Depois que a aplicação estiver rodando, você pode:
+
+1. Acessar o Swagger em: https://localhost:7077
+2. Criar um template de e-mail
+3. Enviar e-mails usando a API
+4. Visualizar os e-mails enviados no MailHog: http://localhost:8025
+
+**Exemplo de teste rápido:**
+```bash
+# Criar um template
+curl -X POST "https://localhost:7077/api/emailtemplates" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "name": "Teste",
+       "subject": "E-mail de Teste",
+       "body": "<h1>Olá!</h1><p>Este é um e-mail de teste.</p>"
+     }'
+
+# Enviar e-mail (substitua os IDs pelos corretos)
+curl -X POST "https://localhost:7077/api/emails/send" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "emailTemplateId": "GUID-DO-TEMPLATE",
+       "recipientIds": ["GUID-DO-DESTINATARIO"]
+     }'
 ```
 
 ## Endpoints da API
