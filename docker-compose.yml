@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: msemail-postgres
+    environment:
+      POSTGRES_DB: msemail_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - msemail-network
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: msemail-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - msemail-network
+
+  # MSEmail API
+  msemail-api:
+    build:
+      context: .
+      dockerfile: MSEmail.API/Dockerfile
+    container_name: msemail-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=msemail_dev;Username=postgres;Password=123456
+      - RabbitMqSettings__Host=rabbitmq
+      - RabbitMqSettings__Port=5672
+      - RabbitMqSettings__Username=admin
+      - RabbitMqSettings__Password=admin123
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=seu_email@gmail.com
+      - SmtpSettings__Password=sua_senha_de_app
+      - SmtpSettings__FromEmail=seu_email@gmail.com
+      - SmtpSettings__FromName=Sistema de Faturas
+      - FileStorageSettings__StorageType=Local
+      - FileStorageSettings__LocalPath=/app/files
+    ports:
+      - "5000:80"
+    volumes:
+      - ./files:/app/files
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - msemail-network
+
+  # MSEmail Worker
+  msemail-worker:
+    build:
+      context: .
+      dockerfile: MSEmail.Worker/Dockerfile
+    container_name: msemail-worker
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=msemail_dev;Username=postgres;Password=123456
+      - RabbitMqSettings__Host=rabbitmq
+      - RabbitMqSettings__Port=5672
+      - RabbitMqSettings__Username=admin
+      - RabbitMqSettings__Password=admin123
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=seu_email@gmail.com
+      - SmtpSettings__Password=sua_senha_de_app
+      - SmtpSettings__FromEmail=seu_email@gmail.com
+      - SmtpSettings__FromName=Sistema de Faturas
+      - FileStorageSettings__StorageType=Local
+      - FileStorageSettings__LocalPath=/app/files
+    volumes:
+      - ./files:/app/files
+    depends_on:
+      - postgres
+      - rabbitmq
+      - msemail-api
+    networks:
+      - msemail-network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  msemail-network:
+    driver: bridge
