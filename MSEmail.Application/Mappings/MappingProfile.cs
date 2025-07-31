@@ -28,5 +28,16 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.RecipientName, opt => opt.MapFrom(src => src.Recipient.Name))
             .ForMember(dest => dest.RecipientEmail, opt => opt.MapFrom(src => src.Recipient.Email))
             .ForMember(dest => dest.EmailTemplateName, opt => opt.MapFrom(src => src.EmailTemplate.Name));
+
+        // Recipient mappings
+        CreateMap<Recipient, RecipientDto>();
+        CreateMap<CreateRecipientDto, Recipient>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
+
+        CreateMap<UpdateRecipientDto, Recipient>()
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
     }
 }

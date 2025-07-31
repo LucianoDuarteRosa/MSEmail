@@ -58,15 +58,17 @@ public class SendEmailHandler : IRequestHandler<SendEmailCommand, SendEmailRespo
             string? pdfPath = null;
             if (!string.IsNullOrEmpty(request.Request.PdfFileName))
             {
-                if (!await _fileStorageService.FileExistsAsync(request.Request.PdfFileName, cancellationToken))
-                {
-                    return new SendEmailResponseDto
-                    {
-                        Success = false,
-                        Message = $"Arquivo PDF '{request.Request.PdfFileName}' não encontrado."
-                    };
-                }
+                // TODO: Implementar validação de arquivo quando sistema de arquivos estiver configurado
+                // if (!await _fileStorageService.FileExistsAsync(request.Request.PdfFileName, cancellationToken))
+                // {
+                //     return new SendEmailResponseDto
+                //     {
+                //         Success = false,
+                //         Message = $"Arquivo PDF '{request.Request.PdfFileName}' não encontrado."
+                //     };
+                // }
                 pdfPath = request.Request.PdfFileName;
+                _logger.LogInformation("Arquivo PDF especificado: {PdfFileName} (validação desabilitada temporariamente)", request.Request.PdfFileName);
             }
 
             var processedEmailLogIds = new List<Guid>();

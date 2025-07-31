@@ -1,43 +1,7 @@
-# Exemplos de Teste da API MSE## 1. Criar Temp## 2. Criar Destinatário
-
-```http
-POST https://localhost:7136/api/recipients de E-mail
-
-```http
-POST https://localhost:7136/api/emailtemplates
-
-## Pré-requisitos
-
-1. Execute o## 6. Consultar Estatísticas
-
-```http
-GET https://localhost:7136/api/emails/statistics
-```
-
-## 7. Reprocessar E-mail
-
-```http
-POST https://localhost:7136/api/emails/GUID-DO-EMAIL/reprocess
-```
-
-## 8. Listar Logs por Status
-
-```http
-GET https://localhost:7136/api/emails/logs/by-status/Failed.ps1`
-2. Inicie a API: `cd MSEmail.API && dotnet run`
-3. Inicie o Worker: `cd MSEmail.Worker && dotnet run`
-4. **Acesse o MailHog**: http://localhost:8025 (para visualizar e-mails)
-
-## URLs Importantes
-
-- **API Swagger**: https://localhost:7136
-- **MailHog Web UI**: http://localhost:8025 (visualizar e-mails enviados)
-- **RabbitMQ Management**: http://localhost:15672 (guest/guest)
-
 ## 1. Criar Template de E-mail
 
 ```http
-POST https://localhost:7136/api/emailtemplates
+POST http://localhost:5050/api/emailtemplates
 Content-Type: application/json
 
 {
@@ -50,7 +14,7 @@ Content-Type: application/json
 ## 2. Criar Destinatário
 
 ```http
-POST https://localhost:7136/api/recipients
+POST http://localhost:5050/api/recipients
 Content-Type: application/json
 
 {
@@ -61,22 +25,83 @@ Content-Type: application/json
 }
 ```
 
-## 3. Listar Templates
+## 3. Listar Destinatários
 
 ```http
-GET https://localhost:7136/api/emailtemplates
+GET http://localhost:5050/api/recipients
 ```
 
-## 4. Obter Template por Nome
+## 4. Listar Apenas Destinatários Ativos
 
 ```http
-GET https://localhost:7136/api/emailtemplates/by-name/Fatura%20CDC
+GET http://localhost:5050/api/recipients?onlyActive=true
 ```
 
-## 5. Enviar E-mails
+## 5. Obter Destinatário por ID
 
 ```http
-POST https://localhost:7136/api/emails/send
+GET http://localhost:5050/api/recipients/GUID-DO-DESTINATARIO
+```
+
+## 6. Obter Destinatário por E-mail
+
+```http
+GET http://localhost:5050/api/recipients/by-email/joao.silva@email.com
+```
+
+## 7. Atualizar Destinatário
+
+```http
+PUT http://localhost:5050/api/recipients/GUID-DO-DESTINATARIO
+Content-Type: application/json
+
+{
+  "id": "GUID-DO-DESTINATARIO",
+  "name": "João Silva Santos",
+  "email": "joao.santos@email.com",
+  "cdc": "CDC001",
+  "isActive": true
+}
+```
+
+## 8. Deletar Destinatário
+
+```http
+DELETE http://localhost:5050/api/recipients/GUID-DO-DESTINATARIO
+```
+
+## 9. Listar Templates
+
+```http
+GET http://localhost:5050/api/emailtemplates
+```
+
+## 10. Obter Template por Nome
+
+```http
+GET http://localhost:5050/api/emailtemplates/by-name/Fatura%20CDC
+```
+
+## 11. Enviar E-mails
+
+```http
+POST http://localhost:5050/api/emails/send
+Content-Type: application/json
+
+{
+  "emailTemplateId": "GUID-DO-TEMPLATE",
+  "recipientIds": ["GUID-DO-DESTINATARIO"],
+  "additionalVariables": {
+    "mes": "Janeiro",
+    "ano": "2025"
+  }
+}
+```
+
+### Exemplo com PDF (opcional - validação desabilitada temporariamente)
+
+```http
+POST http://localhost:5050/api/emails/send
 Content-Type: application/json
 
 {
@@ -90,19 +115,19 @@ Content-Type: application/json
 }
 ```
 
-## 6. Consultar Estatísticas
+## 12. Consultar Estatísticas
 
 ```http
 GET http://localhost:5000/api/emails/statistics
 ```
 
-## 7. Reprocessar E-mail Falhado
+## 13. Reprocessar E-mail Falhado
 
 ```http
 POST http://localhost:5000/api/emails/GUID-DO-EMAIL/reprocess
 ```
 
-## 8. Listar Logs por Status
+## 14. Listar Logs por Status
 
 ```http
 GET http://localhost:5000/api/emails/logs/by-status/Failed
@@ -156,7 +181,7 @@ GET http://localhost:5000/api/emails/logs/by-status/Failed
 ```bash
 # Criar múltiplos destinatários
 for i in {1..100}; do
-  curl -X POST https://localhost:7136/api/recipients \
+  curl -X POST http://localhost:5050/api/recipients \
     -H "Content-Type: application/json" \
     -d "{
       \"name\": \"Usuario $i\",
@@ -167,7 +192,7 @@ for i in {1..100}; do
 done
 
 # Enviar para todos
-curl -X POST https://localhost:7136/api/emails/send \
+curl -X POST http://localhost:5050/api/emails/send \
   -H "Content-Type: application/json" \
   -d "{
     \"emailTemplateId\": \"GUID-DO-TEMPLATE\",
@@ -238,8 +263,8 @@ Para testar localmente:
 
 ## URLs de Desenvolvimento
 
-- **API**: https://localhost:7136
-- **Swagger**: https://localhost:7136/swagger
+- **API**: http://localhost:5050
+- **Swagger**: http://localhost:5050/swagger
 - **MailHog Web**: http://localhost:8025
 - **MailHog API**: http://localhost:8025/api/v1/messages
 - **RabbitMQ Management**: http://localhost:15672 (guest/guest)
