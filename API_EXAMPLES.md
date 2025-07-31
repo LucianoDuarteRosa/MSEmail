@@ -1,4 +1,10 @@
-# Exemplos de Teste da API MSEmail
+# Exemplos de Teste da API MSE## 1. Criar Temp## 2. Criar Destinatário
+
+```http
+POST https://localhost:7136/api/recipients de E-mail
+
+```http
+POST https://localhost:7136/api/emailtemplates
 
 ## Pré-requisitos
 
@@ -24,7 +30,7 @@ GET https://localhost:7077/api/emails/logs/by-status/Failed.ps1`
 
 ## URLs Importantes
 
-- **API Swagger**: https://localhost:7077
+- **API Swagger**: https://localhost:7136
 - **MailHog Web UI**: http://localhost:8025 (visualizar e-mails enviados)
 - **RabbitMQ Management**: http://localhost:15672 (guest/guest)
 

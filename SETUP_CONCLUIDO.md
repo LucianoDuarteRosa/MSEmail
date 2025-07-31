@@ -26,7 +26,7 @@
 cd MSEmail.API
 dotnet run
 ```
-- **Swagger**: https://localhost:7077
+- **Swagger**: https://localhost:7136
 
 ### 2. **Executar o Worker**
 ```powershell
@@ -36,7 +36,7 @@ dotnet run
 ```
 
 ### 3. **Testar Envio de E-mails**
-1. Acesse o **Swagger**: https://localhost:7077
+1. Acesse o **Swagger**: https://localhost:7136/swagger
 2. Crie um template de e-mail
 3. Crie destinatários
 4. Envie e-mails
@@ -46,7 +46,7 @@ dotnet run
 
 | Serviço | URL | Credenciais |
 |---------|-----|-------------|
-| **API Swagger** | https://localhost:7077 | - |
+| **API Swagger** | https://localhost:7136/swagger | - |
 | **MailHog Web** | http://localhost:8025 | - |
 | **RabbitMQ Management** | http://localhost:15672 | guest/guest |
 
@@ -73,7 +73,7 @@ docker logs msemail-mailhog
 
 ```bash
 # Criar template
-curl -X POST "https://localhost:7077/api/emailtemplates" \
+curl -X POST "https://localhost:7136/api/emailtemplates" \
      -H "Content-Type: application/json" \
      -d '{
        "name": "Teste",

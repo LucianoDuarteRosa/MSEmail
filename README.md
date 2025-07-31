@@ -252,7 +252,7 @@ cd MSEmail.API
 dotnet run
 ```
 
-A API estará disponível em: https://localhost:7077 (Swagger na raiz)
+A API estará disponível em: https://localhost:7136 (Swagger na raiz)
 
 ### 5. Executar o Worker
 
@@ -265,7 +265,7 @@ dotnet run
 
 Depois que a aplicação estiver rodando, você pode:
 
-1. Acessar o Swagger em: https://localhost:7077
+1. Acessar o Swagger em: https://localhost:7136
 2. Criar um template de e-mail
 3. Enviar e-mails usando a API
 4. Visualizar os e-mails enviados no MailHog: http://localhost:8025
@@ -273,7 +273,7 @@ Depois que a aplicação estiver rodando, você pode:
 **Exemplo de teste rápido:**
 ```bash
 # Criar um template
-curl -X POST "https://localhost:7077/api/emailtemplates" \
+curl -X POST "https://localhost:7136/api/emailtemplates" \
      -H "Content-Type: application/json" \
      -d '{
        "name": "Teste",
@@ -282,7 +282,7 @@ curl -X POST "https://localhost:7077/api/emailtemplates" \
      }'
 
 # Enviar e-mail (substitua os IDs pelos corretos)
-curl -X POST "https://localhost:7077/api/emails/send" \
+curl -X POST "https://localhost:7136/api/emails/send" \
      -H "Content-Type: application/json" \
      -d '{
        "emailTemplateId": "GUID-DO-TEMPLATE",
