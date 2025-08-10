@@ -3,7 +3,7 @@ $baseUrl = "http://localhost:5050"
 $templateId = "f3bf5e4d-639f-4e9c-b2b8-16b48934f090"
 $recipientId = "730f5f59-40ac-4c5e-b326-b9348bf6e5b1"
 
-Write-Host "Enviando 50 e-mails para a fila..." -ForegroundColor Green
+Write-Host "Enviando 1000 e-mails para a fila..." -ForegroundColor Green
 
 for ($i = 1; $i -le 1000; $i++) {
     # Corrigido: todas as variáveis como string
